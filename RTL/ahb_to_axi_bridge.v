@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////
 // 这是一个简单的AHB-Lite到AXI4-Lite桥代码的例子。这个代码主要包含了
-// AHB-Lite和AXI4-Lite之间的信号映射以及控制状态的逻辑，以实现两个总
-// 线之间的数据传输和通信。在这个例子中，将AHB-Lite主机的地址和控制信号
+// AHB-Lite和AXI4-Lite之间的信号映射以及控制状态的逻辑，以实现两个总线之间
+// 的数据传输和通信。在这个例子中，将AHB-Lite主机的地址和控制信号
 // 转换为AXI4-Lite主机的地址和控制信号，同时将AXI4-Lite从机的数据转换为AHB-Lite从机的数据。
 ///////////////////////////////////////////////////////////////////////////////////////
 
@@ -17,6 +17,12 @@ module ahb2axi (
     input  [1:0]  hsel,
     input  [1:0]  htrans,
     input         hwrite,
+    // temp
+    input         hrdata,
+    input         htrans,
+    input         hwrite,
+    input         intr,
+
     output [31:0] araddr,
     output [7:0]  arlen,
     output        arvalid,
