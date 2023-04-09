@@ -15,6 +15,8 @@
 ```
   |-- dataset                   // 数据集
   |-- document                  // 开发文档
+    |-- connect_relate.md       // 自定义模块连接关系说明
+    |-- constraint.md           // 硬件约束参考
   |-- FPGA                      // FPGA 工程文件，例如约束文件
   |-- RTL                       // RTL 代码
   |-- software                  // 软件侧相关程序代码

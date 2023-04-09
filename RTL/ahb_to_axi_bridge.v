@@ -1,62 +1,98 @@
 ///////////////////////////////////////////////////////////////////////////////////////
-// 这是一个简单的AHB-Lite到AXI4-Lite桥代码的例子。这个代码主要包含了
-// AHB-Lite和AXI4-Lite之间的信号映射以及控制状态的逻辑，以实现两个总线之间
-// 的数据传输和通信。在这个例子中，将AHB-Lite主机的地址和控制信号
-// 转换为AXI4-Lite主机的地址和控制信号，同时将AXI4-Lite从机的数据转换为AHB-Lite从机的数据。
+// 该模块实现了 AHB-Lite 到 AXI4-Lite 桥。代码中主要包含了
+// AHB-Lite 和 AXI4-Lite 之间的信号映射以及控制状态的逻辑，以实现两个总线之间
+// 的数据传输和通信。将 AHB-Lite 主机的地址和控制信号转换为AXI4-Lite
+// 主机的地址和控制信号，同时将 AXI4-Lite 从机的数据转换为 AHB-Lite 从机的数据。
 ///////////////////////////////////////////////////////////////////////////////////////
 
-module ahb2axi (
-    input  clk,
-    input  reset,
-    input  [31:0] haddr,
-    input  [2:0]  hburst,
-    input  [2:0]  hsize,
-    input  [3:0]  hprot,
-    input         hwdata_valid,
-    input  [31:0] hwdata,
-    input  [1:0]  hsel,
-    input  [1:0]  htrans,
-    input         hwrite,
-    // temp
-    input         hrdata,
-    input         htrans,
-    input         hwrite,
-    input         intr,
+module ahb_axi_bridge (
+    // AHB-Lite
+    input           clk,
+    input           reset,
+    input   [31:0]  haddr,
+    input   [2:0]   hburst,
+    input   [2:0]   hsize,
+    input   [3:0]   hprot,
+    input           hwdata_valid,
+    input   [31:0]  hwdata,
+    input   [1:0]   hsel,
+    input   [1:0]   htrans,
+    input           hwrite,
+    input           hrdata,
+    input           intr,
+    output          hready,
+    
+    // AXI4 Lite
+    // write address signal
+    input           awready,
+    output          awuser,
+    output  [31:0]  awaddr,
+    output  [3:0]   awid,
+    output  [3:0]   awlen,
+    output          awvalid,
+    output          awburst,
+    // read address signal
+    input           arready,
+    output          arvalid,
+    output  [31:0]  araddr,
+    output  [3:0]   arid,
+    output          aruser,
+    output  [3:0]   arlen,
+    output          arburst;
+    // write signal
+    input           wready,
+    input   [3:0]   wid,
+    input           wlast,
+    output  [127:0] wdata,
+    output  [15:0]  wstrb,
+    output          wvalid,
+    // read address
+    input   [127:0] rdata,
+    input   [1:0]   rresp,
+    input           rvalid,
+    input           rlast,
+    input   [3:0]   rid,
+    input   [1:0]   rready
 
-    output [31:0] araddr,
-    output [7:0]  arlen,
-    output        arvalid,
-    output        awvalid,
-    output [31:0] wdata,
-    output [3:0]  wstrb,
-    output        wvalid,
-    output        hready,
-    input  [1:0]  arready,
-    input  [1:0]  awready,
-    input  [31:0] rdata,
-    input  [1:0]  rresp,
-    input         rvalid,
-    input  [1:0]  rready
 );
 
-reg [31:0] axi_araddr;
-reg [7:0]  axi_arlen;
-reg        axi_arvalid;
-reg        axi_awvalid;
-reg [31:0] axi_wdata;
-reg [3:0]  axi_wstrb;
-reg        axi_wvalid;
-reg        axi_hready;
-reg [1:0]  axi_arready;
-reg [1:0]  axi_awready;
-reg [31:0] axi_rdata;
-reg [1:0]  axi_rresp;
-reg        axi_rvalid;
-reg [1:0]  axi_rready;
-reg [2:0]  axi_arburst;
-reg [2:0]  axi_awburst;
-reg [1:0]  axi_arid;
-reg [1:0]  axi_awid;
+reg         axi_awready;
+reg [31:0]  axi_awaddr;
+reg [3:0]   axi_awid;
+reg [3:0]   axi_awlen;
+reg         axi_awvalid;
+reg [2:0]   axi_awburst;
+
+reg         axi_arready;
+reg         axi_arvalid;
+reg [31:0]  axi_araddr;
+reg [3:0]   axi_arid;
+reg [3:0]   axi_arlen;
+reg [2:0]   axi_arburst;
+
+reg         axi_wready;
+reg [3:0]   axi_wid;
+reg         axi_wlast;
+reg [127:0] axi_wdata;
+reg [15:0]  axi_wstrb;
+reg         axi_wvalid;
+
+reg [127:0] axi_rdata;
+reg [1:0]   axi_rresp;
+reg         axi_rvalid;
+reg [1:0]   axi_rready;
+reg [3:0]   axi_rid;
+
+reg         axi_bready;
+reg         axi_bvalid;
+reg         axi_bid;
+reg         axi_bresp;
+reg         axi_hready;
+
+reg         axi_arvalid_d1;
+reg         axi_awvalid_d1;
+reg         axi_wvalid_d1;
+
 
 // HSIZE mapping to AXI4's data width
 wire [1:0] axi_data_size =  (hsize == 2'b00) ? 2'b00 : 
@@ -75,11 +111,12 @@ wire [2:0] axi_prot_level = (hprot == 3'b000) ? 3'b000 :
 // generate read address signals
 assign araddr = haddr;
 assign arlen = hsize;
-assign axi_arburst =    (hburst == 3'b000) ? 3'b000 :
+assign axi_arburst_d1 = (hburst == 3'b000) ? 3'b000 :
                         (hburst == 3'b001) ? 3'b001 :
                         (hburst == 3'b010) ? 3'b010 :
                         (hburst == 3'b011) ? 3'b011 : 3'b000;
-assign axi_arid = (hsel == 2'b00) ? 2'b00 : 2'b01;
+assign axi_arid_d1 = (hsel == 2'b00) ? 2'b00 : 2'b01;
+
 
 always @(posedge clk) begin
     if (reset) begin
@@ -96,8 +133,8 @@ always @(posedge clk) begin
         2'b00_1 : begin // HREAD
                     axi_araddr <= haddr;
                     axi_arlen <= hsize;
-                    axi_arburst <= axi_arburst;
-                    axi_arid <= axi_arid;
+                    axi_arburst <= axi_arburst_d1;
+                    axi_arid <= axi_arid_d1;
                     axi_arvalid <= 1'b1;
                     axi_awvalid <= 1'b0;
                     axi_wvalid <= 1'b0;
@@ -119,6 +156,9 @@ always @(posedge clk) begin
         endcase
     end
 end
+
+assign arburst = axi_arburst;
+assign arid = axi_arid;
 
 always @(posedge clk) begin
     if (reset) begin
@@ -169,6 +209,7 @@ end
 
 assign hready = axi_hready;
 assign hrdata = axi_rdata;
+
 
 always @(posedge clk) begin
     if (reset) begin
