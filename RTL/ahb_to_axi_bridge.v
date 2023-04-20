@@ -14,11 +14,11 @@ module ahb_axi_bridge (
     input   [2:0]   hsize,
     input   [3:0]   hprot,
     input           hwdata_valid,
-    input   [127:0] hwdata,
+    input   [15:0]  hwdata,
     input           hsel,
     input   [1:0]   htrans,
     input           hwrite,
-    input   [127:0] hrdata,
+    output  [127:0] hrdata,
     input           intr,
     output          hready,
     output  [1:0]   hresp,
@@ -44,7 +44,7 @@ module ahb_axi_bridge (
     input           wready,
     input   [3:0]   wid,
     input           wlast,
-    output  [127:0] wdata,
+    output  [15:0]  wdata,
     output  [15:0]  wstrb,
     output          wvalid,
     // read address
@@ -74,7 +74,7 @@ reg [2:0]   axi_arburst;
 reg         axi_wready;
 reg [3:0]   axi_wid;
 reg         axi_wlast;
-reg [127:0] axi_wdata;
+reg [15:0]  axi_wdata;
 reg [15:0]  axi_wstrb;
 reg         axi_wvalid;
 
@@ -140,6 +140,26 @@ assign axi_arburst_dl = (hburst == 3'b000) ? 3'b000 :
                         (hburst == 3'b011) ? 3'b011 : 3'b000;
 assign axi_arid_dl = (hsel == 2'b00) ? 2'b00 : 2'b01;
 
+assign  hready = axi_hready;
+assign  hresp = axi_hresp;
+assign  arburst = axi_arburst;
+assign  arid = axi_arid;
+assign  arvalid = axi_arvalid;
+assign  awaddr = axi_awaddr;
+assign  awburst = axi_awburst;
+assign  awvalid = axi_awvalid;
+assign  awid = axi_awid;
+//assign  rdata = axi_rdata;
+//assign  bresp = axi_bresp;
+assign  wdata = axi_wdata;
+//assign  wready = axi_wready;
+assign  wvalid = axi_wvalid;
+assign  wstrb = axi_wstrb;
+assign  rready = axi_rready;
+assign  rresp = axi_rresp;
+//assign  rvalid = axi_rvalid;
+
+
 
 always @(posedge clk) begin
     if (reset) begin
@@ -172,20 +192,17 @@ always @(posedge clk) begin
                     axi_wvalid <= 1'b1;
         end
         default : begin
-                    axi_arvalid <= 1'b0;
-                    axi_awvalid <= 1'b0;
-                    axi_wvalid <= 1'b0;
+                    axi_arvalid <= axi_arvalid;
+                    axi_awvalid <= axi_awvalid;
+                    axi_wvalid <= axi_wvalid;
         end
         endcase
     end
 end
 
-assign arburst = axi_arburst;
-assign arid = axi_arid;
-
 always @(posedge clk) begin
     if (reset) begin
-        axi_wdata <= 128'h0;
+        axi_wdata <= 16'h0;
         axi_wstrb <= 16'h0;
     end 
     else begin
@@ -224,15 +241,11 @@ always @(posedge clk) begin
                 axi_hready <= (arready & awready & 1'b1);
         end
         default : begin
-                axi_hready <= 1'b0;
+                axi_hready <= axi_hready;
         end
         endcase
     end
 end
-
-assign hready = axi_hready;
-//assign hrdata = axi_rdata;
-
 
 always @(posedge clk) begin
     if (reset) begin
@@ -318,29 +331,14 @@ always @(posedge clk) begin
                     axi_bid <= axi_bid;
         end
         default : begin
-                    axi_rvalid <= 1'b0;
-                    axi_bvalid <= 1'b0;
-                    axi_rresp <= 2'b00;
-                    axi_bid <= 2'b00;
+                    axi_rvalid <= axi_rvalid;
+                    axi_bvalid <= axi_bvalid;
+                    axi_rresp <= axi_rresp;
+                    axi_bid <= axi_bid;
         end
         endcase
     end
 end
-/*
-always @(posedge clk) begin
-    if (reset) begin
-        axi_hresp <= 2'b00;
-    end
-    else begin
-        case (axi_rresp)
-        2'b00 : begin
-            axi_hresp <= 2'b00;
-        end
-        2'b01 : begin
-            axi_hresp <= 2'b01;
-        end
-        2'b10 : 
-*/
 
 always @(posedge clk) begin
     if (reset) begin
@@ -362,5 +360,6 @@ always @(posedge clk) begin
         end
     end
 end
+
 
 endmodule
