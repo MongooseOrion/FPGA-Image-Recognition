@@ -108,33 +108,16 @@ wire        axi_arid_dl;
 wire        axi_rvalid_dl;
 wire        axi_bvalid_dl;
 
-assign  axi_arvalid_dl = axi_arvalid_dg;
-assign  axi_awvalid_dl = axi_awvalid_dg;
-assign  axi_wvalid_dl = axi_wvalid_dg;
+//assign  axi_arvalid_dl = axi_arvalid_dg;
+//assign  axi_awvalid_dl = axi_awvalid_dg;
+//assign  axi_wvalid_dl = axi_wvalid_dg;
 assign  axi_arburst_dl = axi_arburst_dg;
 assign  axi_arid_dl = axi_arid_dg;
 assign  axi_rvalid_dl = axi_rvalid_dg;
 assign  axi_bvalid_dl = axi_bvalid_dg;
 
 
-// HSIZE mapping to AXI4's data width
-wire [1:0] axi_data_size =  (hsize == 2'b00) ? 2'b00 : 
-                            (hsize == 2'b01) ? 2'b01 : 
-                            (hsize == 2'b10) ? 2'b10 : 
-                            (hsize == 2'b11) ? 2'b11 : 2'b00;
-
-// HPROT mapping to AXI4's protection level
-wire [2:0] axi_prot_level = (hprot == 3'b000) ? 3'b000 :
-                            (hprot == 3'b001) ? 3'b001 :
-                            (hprot == 3'b010) ? 3'b010 :
-                            (hprot == 3'b011) ? 3'b011 :
-                            (hprot == 3'b100) ? 3'b101 :
-                            (hprot == 3'b101) ? 3'b110 : 3'b111;
-
 // generate read address signals
-assign araddr = haddr;
-assign awlen = (htrans == 2'b10) ? axi_data_size : 4'b0000;
-assign arlen = (htrans == 2'b11) ? axi_data_size : 4'b0000;
 assign axi_arburst_dl = (hburst == 3'b000) ? 3'b000 :
                         (hburst == 3'b001) ? 3'b001 :
                         (hburst == 3'b010) ? 3'b010 :
@@ -147,15 +130,18 @@ assign  hrdata = axi_hrdata;
 assign  arburst = axi_arburst;
 assign  arid = axi_arid;
 assign  arvalid = axi_arvalid;
+assign  araddr = axi_araddr;
+assign  arlen = axi_arlen;
 assign  awaddr = axi_awaddr;
 assign  awburst = axi_awburst;
 assign  awvalid = axi_awvalid;
 assign  awid = axi_awid;
+assign  awlen = axi_awlen;
 assign  wdata = axi_wdata;
 //assign  wready = axi_wready;
 assign  wvalid = axi_wvalid;
 assign  wstrb = axi_wstrb;
-assign  rready = axi_rready;
+//assign  rready = axi_rready;
 //assign  rresp = axi_rresp;
 //assign  rvalid = axi_rvalid;
 
@@ -347,16 +333,16 @@ always @(posedge clk or negedge reset) begin
         axi_bresp <= 2'b00;
     end 
     else begin
-        if (axi_rvalid & axi_rready) begin
-            axi_hrdata <= axi_rdata;
+        if (rvalid & rready) begin
+            axi_hrdata <= rdata;
             axi_bresp <= axi_bresp;
         end 
         else if (axi_bvalid & axi_bready) begin
-            axi_hrdata <= axi_hrdata;
+            axi_hrdata <= rdata;
             axi_bresp <= axi_bresp;
         end 
         else begin
-            axi_hrdata <= axi_hrdata;
+            axi_hrdata <= rdata;
             axi_bresp <= axi_bresp;
         end
     end
@@ -367,7 +353,7 @@ always @(posedge clk or negedge reset) begin
         axi_hresp <= 2'b00;
     end
     else begin
-        case(axi_rvalid)
+        case(rvalid)
         1'b0: begin
             axi_hresp <= axi_hresp;
         end
