@@ -111,8 +111,8 @@ wire        axi_bvalid_dl;
 //assign  axi_arvalid_dl = axi_arvalid_dg;
 //assign  axi_awvalid_dl = axi_awvalid_dg;
 //assign  axi_wvalid_dl = axi_wvalid_dg;
-assign  axi_arburst_dl = axi_arburst_dg;
-assign  axi_arid_dl = axi_arid_dg;
+//assign  axi_arburst_dl = axi_arburst_dg;
+//assign  axi_arid_dl = axi_arid_dg;
 assign  axi_rvalid_dl = axi_rvalid_dg;
 assign  axi_bvalid_dl = axi_bvalid_dg;
 
@@ -232,7 +232,7 @@ always @(posedge clk or negedge reset) begin
         endcase
     end
 end
-
+/*
 always @(posedge clk or negedge reset) begin
     if (!reset) begin
         axi_arvalid_dg <= 1'b0;
@@ -245,6 +245,7 @@ always @(posedge clk or negedge reset) begin
         axi_wvalid_dg <= axi_wvalid;
     end
 end
+*/
 /*
 always @(posedge clk or negedge reset) begin
     if (!reset) begin

@@ -1,8 +1,14 @@
-# 管脚约束参考
+# 管脚约束参考和模块连接说明
 
-在本页，将给出该项目中**难以查阅**的管脚的约束。全部的管脚约束你可以在 `../FPGA/` 文件夹下点击 `.fdc` 文件查看。
+在本页，将给出该项目中部分管脚的约束以及模块间的连线说明。具体的管脚约束配置你可以在 `../FPGA/` 文件夹下点击 `.fdc` 文件查看。
 
 ## DDR3
+
+MES50HP 配有两个 4Gbit（512MB）的 DDR3 芯片（共计 8Gbit），DDR 的总线宽度为 32bit。DDR3 的储存直接连接到 FPGA 的 BANK B3。
+
+在 PDS 中，DDR 模块作为 IP 核提供，数据接口包括 AXI4 lite 总线和 APB 总线。由于 wujian100 的总线为 AHB lite 协议，因此需要 AHB Lite 转 AXI4 Lite 转接桥。具体内容请参阅 `../RTL/ahb_to_axi_bridge.v`。
+
+该 IP 核的 AXI4 Lite 接口部分挂载在 `x_main_dummy_top3` 的位置，APB 接口部分挂载在 `x_apb1_dummy_top8` 的位置。
 
 请注意，在此处的端口名称按照 `IP Catelog` 中所给出的命名为准，可能与开发手册中的有所不同。
 
@@ -43,3 +49,6 @@
 | DQ[16-23] | B3 | G3 |
 | DQ[24-31] | B3 | G2 |
 
+## HDMI
+
+ 
