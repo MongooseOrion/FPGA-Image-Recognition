@@ -24,7 +24,7 @@
 
 ## 硬件侧
 
-在该项目中，采用的是广受好评的开源处理器架构 RISC-V 作为中央处理核心。具体而言，该项目采用一个[无剑 100](https://github.com/MongooseOrion/wujian100_open) 处理器核心，挂载的外部模块包括：
+在该项目中，采用开源处理器架构 RISC-V 作为中央处理核心。具体而言，该项目采用[蜂鸟（hbirdv2）](https://github.com/MongooseOrion/e203_hbirdv2) 处理器核心，挂载的外部模块包括：
 
   * DDR3
   * HDMI
@@ -37,5 +37,5 @@
 
 此项目采用 YOLOv3 进行自定义训练，并转译为 TensorFlow-Lite 架构以便在微处理器上运行。
 
-为运行 TensorFlow-Lite，我们在 RISC-V 中构建了一个轻量级的开源操作系统。
+为运行 TensorFlow-Lite，我们在 RISC-V 中构建了一个轻量级的开源操作系统 FreeRTOS。
 
