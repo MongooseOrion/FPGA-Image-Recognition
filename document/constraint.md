@@ -49,6 +49,25 @@ MES50HP 配有两个 4Gbit（512MB）的 DDR3 芯片（共计 8Gbit），DDR 的总线宽度为 32bi
 | DQ[16-23] | B3 | G3 |
 | DQ[24-31] | B3 | G2 |
 
-## HDMI
+## MCU 系统约束
 
- 
+| 端口名 | 管脚编号 | 硬件位置 | 管脚功能 |
+|:----- | :----: | :-----: |:---- |
+| gpioA[31] | | | |
+| gpioA[17] | R9 | | UART_TX |
+| gpioA[16] | R8 | | UART_RX |
+| gpioA[13] | F15 | | EEPROM(IIC)_SCL |
+| gpioA[12] | G8 | | EEPROM(IIC)_SDA |
+| ======= | ====== | ======= | ========= |
+| mcu_wakeup | H20 | KEY7 | MCU 唤醒 |
+| pmu_padon | F7 | LED7 | MCU 电源指示 |
+| pmu_padrst | F8 | LED8 | MCU 复位指示 |
+| ======= | ====== | ======= | ========= |
+| qspi0_dq[3] | T14 | QSPI_7 | QSPI 数据位 |
+| qspi0_dq[2] | R13 | QSPI_3 | QSPI 数据位 |
+| qspi0_dq[1] | AA20 | QSPI_2 | QSPI 数据位 |
+| qspi0_dq[0] | AB20 | QSPI_5 | QSPI 数据位 |
+| qspi0_cs | AA3 | QSPI_1 | QSPI 片选 |
+| qspi0_sck | Y20 | QSPI_6 | 串行数据时钟 |
+| clkin1 | P20 | NULL | clock |
+| globalrst | H17 | KEY8 | reset |
