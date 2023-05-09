@@ -282,7 +282,7 @@ module e203_subsys_mems(
     .o4_icb_rsp_excl_ok(1'b0),
     .o4_icb_rsp_rdata  (sysmem_icb_rsp_rdata),
 
-   //  * Example AXI    
+   //  * AXI DDR    
     .o5_icb_enable     (1'b1),
 
     .o5_icb_cmd_valid  (expl_axi_icb_cmd_valid),

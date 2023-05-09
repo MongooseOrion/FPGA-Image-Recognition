@@ -13,8 +13,11 @@
 *.log
 *.zip
 *.xml
+*.h5
 
 ## 隐藏文件夹
 **/.Xil
 **/.jobs
-**/project.old
+/project.old
+/dataset/*
+!/dataset/process.py

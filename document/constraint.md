@@ -53,15 +53,43 @@ MES50HP 配有两个 4Gbit（512MB）的 DDR3 芯片（共计 8Gbit），DDR 的总线宽度为 32bi
 
 | 端口名 | 管脚编号 | 硬件位置 | 管脚功能 |
 |:----- | :----: | :-----: |:---- |
-| gpioA[31] | | | |
-| gpioA[17] | R9 | | UART_TX |
-| gpioA[16] | R8 | | UART_RX |
-| gpioA[13] | F15 | | EEPROM(IIC)_SCL |
-| gpioA[12] | G8 | | EEPROM(IIC)_SDA |
+| gpioA[31] | C4 | NULL | SD_CLK |
+| gpioA[30] | A4 | NULL | SD_CMD |
+| gpioA[29] | D5 | NULL | SD_DATA[0] |
+| gpioA[28] | D4 | NULL | SD_DATA[1] |
+| gpioA[27] | D2 | NULL | SD_DATA[2] |
+| gpioA[26] | D3 | NULL | SD_DATA[3] |
+| gpioA[25] | G9 | NULL | SD_DETECT |
+| gpioA[17] | R9 | NULL | UART_TX |
+| gpioA[16] | R8 | NULL | UART_RX |
+| gpioA[13] | F15 | NULL | EEPROM(IIC)_SCL |
+| gpioA[12] | G8 | NULL | EEPROM(IIC)_SDA |
+| ======= | ====== | ======= | ========= |
+| gpioB[31] | AA4 | PIN36 | |
+| gpioB[30] | AB4 | PIN35 | |
+| gpioB[29] | Y5 | PIN34 | |
+| gpioB[28] | AB5 | PIN33 | |
+| gpioB[27] | W6 | PIN32 | |
+| gpioB[26] | Y6 | PIN31 | |
+| gpioB[25] | AA8 | PIN30 | |
+| gpioB[24] | AB8 | PIN29 | |
+| gpioB[23] | V7 | PIN28 | |
+| gpioB[22] | W8 | PIN27 | |
+| gpioB[21] | T8 | PIN26 | |
+| gpioB[20] | U8 | PIN25 | |
+| gpioB[19] | U9 | PIN24 | |
+| gpioB[18] | V9 | PIN23 | |
+| gpioB[17] | Y9 | PIN22 | |
+| gpioB[16] | AB9 | PIN21 | |
 | ======= | ====== | ======= | ========= |
 | mcu_wakeup | H20 | KEY7 | MCU 唤醒 |
 | pmu_padon | F7 | LED7 | MCU 电源指示 |
 | pmu_padrst | F8 | LED8 | MCU 复位指示 |
+| ======= | ====== | ======= | ========= |
+| mcu_TCK | U6 | PMOD PIN7 | JTAG |
+| mcu_TDI | AB7 | PMOD PIN3 | JTAG |
+| mcu_TDO | Y8 | PMOD PIN5 | JTAG |
+| mcu_TMS | AB6 | PMOD PIN1 | JTAG |
 | ======= | ====== | ======= | ========= |
 | qspi0_dq[3] | T14 | QSPI_7 | QSPI 数据位 |
 | qspi0_dq[2] | R13 | QSPI_3 | QSPI 数据位 |
@@ -69,5 +97,6 @@ MES50HP 配有两个 4Gbit（512MB）的 DDR3 芯片（共计 8Gbit），DDR 的总线宽度为 32bi
 | qspi0_dq[0] | AB20 | QSPI_5 | QSPI 数据位 |
 | qspi0_cs | AA3 | QSPI_1 | QSPI 片选 |
 | qspi0_sck | Y20 | QSPI_6 | 串行数据时钟 |
+| ======= | ====== | ======= | ========= |
 | clkin1 | P20 | NULL | clock |
 | globalrst | H17 | KEY8 | reset |

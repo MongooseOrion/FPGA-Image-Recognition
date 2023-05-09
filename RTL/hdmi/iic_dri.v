@@ -1,30 +1,25 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
-// Company: Myminieye
-// Engineer: Nill
+// Company:Meyesemi 
+// Engineer: Will
 // 
-// Create Date: 2020-03-09 17:54  
+// Create Date: 2023-01-29 20:31  
 // Design Name:  
-// Module Name:  iic_dri
+// Module Name: 
 // Project Name: 
-// Target Devices: Gowin
+// Target Devices: Pango
 // Tool Versions: 
 // Description: 
 //      
 // Dependencies: 
 // 
 // Revision:
-// Revision 0.01 - File Created
-// Additional Comments:
-// 
-// Revision 0.02 - Modify by Nill
-// Additional Comments:  修改IIC状态机，第二段为组合逻辑，赋值应使用“=”，将“=”替换“<= `UD”
+// Revision 1.0 - File Created
+// Additional Comments: 修改IIC状态机，第二段为组合逻辑，赋值应使用“=”，将“=”替换“<= `UD”
 //                       修改busy区间，由于iic_dri不能缓冲命令，应在接收一次触发后就进入busy状态，
 //                                修改语句：if(start_en)       busy <= `UD 1'b1;   
 //////////////////////////////////////////////////////////////////////////////////
-
 `define UD #1
-
 module iic_dri #(
     parameter            CLK_FRE = 27'd50_000_000,  //system clock frequency
     parameter            IIC_FREQ = 20'd400_000,    //I2c clock frequency
