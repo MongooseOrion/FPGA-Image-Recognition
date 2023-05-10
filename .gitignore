@@ -20,4 +20,5 @@
 **/.jobs
 /project.old
 /dataset/*
-!/dataset/process.py
+!/dataset/*.py
+!/dataset/*.txt

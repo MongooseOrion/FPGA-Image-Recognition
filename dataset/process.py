@@ -2,8 +2,9 @@ import cv2
 import os
 import sys
 import json
+import shutil
 
-# 把视频所有帧分离
+# 把视频所有帧分离为图片
 def save_img():
     video_path = 'C:\\Users\\smn90\\repo\\FPGA-Image-Recognition\\dataset\\video\\'
     videos = os.listdir(video_path)
@@ -89,9 +90,11 @@ def fm_js():
         # 检查 json 文件中的 video_id 是否存在有视频
         #if img_folder_name in videos:
 
-        list_object=[]
+        #list_object=[]
+        dic_object={}
         for item in data['subject/objects']:
-            list_object.append(item['category'])
+            #list_object.append(item['category'])
+            dic_object[str(item['tid'])] = item['category']
             
         with open('train.txt','a') as train:
             num = 0
@@ -104,7 +107,8 @@ def fm_js():
                     ymin = bbox_obj['bbox']['ymin']
                     xmax = bbox_obj['bbox']['xmax']
                     ymax = bbox_obj['bbox']['ymax']
-                    obj = list_object[tid]
+                    #obj=list_object[tid]
+                    obj = dic_object.get(str(tid))
                         
                     # 把图片的绝对路径打印
                     num_temp = str(num).zfill(6)
@@ -119,13 +123,78 @@ def fm_js():
 
                 num = num + 1
 
-    # 中断
-    
-    ans = input('input anything: ')
-    if ans=='1':
-        sys.exit()
-    
+        # 中断
+        '''
+        ans = input('input anything: ')
+        if ans=='1':
+            sys.exit()
+    '''
+        
+# 将图片文件搬运到另一个文件夹
+def move():
+    folder_path = 'C:\\Users\\smn90\\repo\\FPGA-Image-Recognition\\dataset\\video\\'
+    folder_list = os.listdir(folder_path)
 
-save_img()
+    for folder in folder_list:
+        try:
+            img_path = os.path.join(folder_path,folder)
+            for img in os.listdir(img_path):
+                src_path = os.path.join(img_path,img)
+                dst_path = os.path.join(folder_path,img)
+                shutil.move(src_path,dst_path)
+        except:
+            continue
+
+        #中断
+        '''
+        ans = input('input anything: ')
+        if ans=='1':
+            sys.exit()
+'''
+
+
+# 交叉比对图片是否都有对应的标注文件，有的放一个文件夹，没有的放另一个文件夹
+def verify():
+    img_path = 'C:\\Users\\smn90\\repo\\FPGA-Image-Recognition\\dataset\\video\\'
+    txt_path = 'C:\\Users\\smn90\\repo\\FPGA-Image-Recognition\\dataset\\train_new.txt'
+    new_path = 'C:\\Users\\smn90\\repo\\FPGA-Image-Recognition\\dataset\\video\\new_folder'
+    
+    with open(txt_path,'r') as f:
+        for line in f:
+            # 获取文件路径
+            file_path = line.split()[0]
+            #print(file_path)
+            # 检查文件是否存在
+            if os.path.isfile(file_path):
+                shutil.move(file_path,new_path)
+            else:
+                with open('train_failed.txt','a') as fail:
+                    fail.write(line)
+'''
+            ans = input('input anything: ')
+            if ans=='1':
+                sys.exit()
+'''
+                
+# 修改txt内容
+def modify():
+    txt_path = 'C:\\Users\\smn90\\repo\\FPGA-Image-Recognition\\dataset\\train.txt'
+
+    with open(txt_path, 'r') as f:
+        lines = f.readlines()
+        new_lines = []
+        for line in lines:
+            new_line = line[:58] + line[84:]
+            new_lines.append(new_line)
+
+    with open('train_new.txt', 'w') as f:
+        f.writelines(new_lines)
+
+
+
+#save_img()
 #rename()
 #fm_js()
+#move()
+verify()
+#modify()

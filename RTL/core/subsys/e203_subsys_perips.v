@@ -1566,6 +1566,27 @@ apb_i2c #(
     .sda_padoen_o  (io_pads_i2c0_sda_o_oen)
 );
 
+  // * HDMI
+
+IOBUF #(
+  .DRIVE        (12),
+  .IBUF_LOW_PWR ("TRUE"),
+  .IOSTANDARD   ("DEFAULT"),
+  .SLEW         ("SLOW")
+) IOBUF_iic_sda (
+  .O            (io_pads_i2c0_sda_i_ival),
+  .IO           (iic_tx_sda),
+  .I            (io_pads_i2c0_sda_o_oval),
+  .T            (1'b1)
+  );
+
+hdmi u_perips_i2c0_hdmi (
+    .sys_clk       (),
+    .rstn_out      (),
+    .iic_tx_scl    (io_pads_i2c0_sda_i_ival),            // output
+    .iic_tx_sda    (iic_tx_sda)                          // inout
+);
+
 
   // * APB Peripheral:  I2C1
   wire [`E203_ADDR_SIZE-1:0] i2c1_apb_paddr;
