@@ -8,27 +8,13 @@ module IOBUF #(
 ) (
   input       I,
   inout       IO,
-  output      O,
+  output      O,  
   input       T
 );
 
-wire pullup;
-assign pullup = (!T) ? 1'b1 : 1'b0;
-
-wire pullup_IO;
-assign pullup_IO = (!IO) ? 1'b1 : 1'b0;
-
-wire buf_in;
-assign buf_in = (I ^ pullup_IO) ? 1'b1 : 1'b0;
-
-wire buf_out;
-assign buf_out = (O & !T) | (buf_in & T);
-
-assign IO = (buf_out ^ pullup) ? 1'b1 : 1'b0;
+assign O = T ? IO : I;
+assign IO = ~T ? I : 1'bz;
+    
 
 endmodule
-
-
-
-
 

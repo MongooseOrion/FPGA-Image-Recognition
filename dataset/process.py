@@ -176,7 +176,7 @@ def verify():
                 sys.exit()
 '''
                 
-# 修改txt内容
+# 修改 txt 内容
 def modify():
     txt_path = 'C:\\Users\\smn90\\repo\\FPGA-Image-Recognition\\dataset\\train.txt'
 
@@ -191,10 +191,35 @@ def modify():
         f.writelines(new_lines)
 
 
+# 统计 txt 的所有目标类别，并替换名称为索引号
+def categary():
+    file_path = 'C:\\Users\\smn90\\repo\\FPGA-Image-Recognition\\dataset\\train.txt'
+    task_path = 'C:\\Users\\smn90\\repo\\FPGA-Image-Recognition\\dataset\\train_new.txt'
+
+    obj_list = []
+    with open(file_path, 'r') as f:
+        for line in f:
+            line_list = line.split()
+            # 以逗号作为标识符检测有几个 bbox
+            for item in line_list:
+                if len(item.split(',')) > 1:
+                    obj = item.split(',')[-1]
+                    if obj not in obj_list:
+                        obj_list.append(obj)
+
+    with open('categary.txt','w') as f:
+            for obj in obj_list:
+                f.write(obj + '\n')
+
+    with open(task_path, 'w') as f:
+        
+
+
 
 #save_img()
 #rename()
 #fm_js()
 #move()
-verify()
+#verify()
 #modify()
+categary()

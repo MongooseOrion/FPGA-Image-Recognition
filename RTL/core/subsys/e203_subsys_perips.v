@@ -1577,7 +1577,7 @@ IOBUF #(
   .O            (io_pads_i2c0_sda_i_ival),
   .IO           (iic_tx_sda),
   .I            (io_pads_i2c0_sda_o_oval),
-  .T            (1'b1)
+  .T            (~io_pads_i2c0_sda_o_oen)
   );
 
 hdmi u_perips_i2c0_hdmi (
