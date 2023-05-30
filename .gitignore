@@ -14,11 +14,14 @@
 *.zip
 *.xml
 *.h5
+*.weights
 
 ## 隐藏文件夹
 **/.Xil
 **/.jobs
 /project.old
 /dataset/*
-!/dataset/*.py
-!/dataset/*.txt
+!/dataset/process.py
+!/dataset/categary.txt
+!/dataset/train_failed.txt
+!/dataset/train_new_2.txt

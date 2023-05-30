@@ -193,8 +193,8 @@ def modify():
 
 # 统计 txt 的所有目标类别，并替换名称为索引号
 def categary():
-    file_path = 'C:\\Users\\smn90\\repo\\FPGA-Image-Recognition\\dataset\\train.txt'
-    task_path = 'C:\\Users\\smn90\\repo\\FPGA-Image-Recognition\\dataset\\train_new.txt'
+    file_path = 'C:\\Users\\smn90\\repo\\FPGA-Image-Recognition\\dataset\\train_new_1.txt'
+    task_path = 'C:\\Users\\smn90\\repo\\FPGA-Image-Recognition\\dataset\\train_new_2.txt'
 
     obj_list = []
     with open(file_path, 'r') as f:
@@ -208,11 +208,48 @@ def categary():
                         obj_list.append(obj)
 
     with open('categary.txt','w') as f:
-            for obj in obj_list:
-                f.write(obj + '\n')
+        for obj in obj_list:
+            f.write(obj + '\n')
 
-    with open(task_path, 'w') as f:
-        
+    with open(task_path, 'r+') as f:
+        lines = f.readlines()
+        f.seek(0)  # 将文件指针移回文件开头
+
+        for line in lines:
+            line = line.strip()
+            items = line.split()
+            new_items = []
+            new_path_list = []
+
+            for item in items:
+                if len(item.split(',')) > 1:
+                    category = item.split(',')[-1]
+                    index = obj_list.index(category)
+                    new_items.append(item.replace(str(category), str(index)))
+                else:
+                    new_path_list.append(item)
+
+            new_line = ' '.join(new_path_list) + ' ' + ' '.join(new_items) + '\n'
+            f.write(new_line)
+
+        f.truncate()  # 截断文件，删除多余内容
+
+
+# 令 txt 的标识与图片一一对应，去除没有 bbox 的帧信息 
+def txt_veri():
+    file_path = 'C:\\Users\\smn90\\repo\\FPGA-Image-Recognition\\dataset\\train_new_2.txt'
+    pic_path = 'C:\\Users\\smn90\\repo\\FPGA-Image-Recognition\\dataset\\video\\'
+
+    with open(file_path, 'r') as f, open('temp.txt', 'w') as temp:
+        for line in f:
+            line_list = line.split()
+            path = line_list[0]
+            if os.path.isfile(path):
+                temp.write(line)
+            else:
+                pass
+
+
 
 
 
@@ -222,4 +259,5 @@ def categary():
 #move()
 #verify()
 #modify()
-categary()
+#categary()
+txt_veri()

@@ -82,6 +82,16 @@ MES50HP 配有两个 4Gbit（512MB）的 DDR3 芯片（共计 8Gbit），DDR 的总线宽度为 32bi
 | gpioB[17] | Y9 | PIN22 | |
 | gpioB[16] | AB9 | PIN21 | |
 | ======= | ====== | ======= | ========= |
+| b_out[7] | P19 | HD_TX_D7 | |
+| b_out[6] | R19 | HD_TX_D6 | |
+| b_out[5] | R22 | HD_TX_D5 | |
+| b_out[4] | R20 | HD_TX_D4 | |
+| b_out[3] | T22 | HD_TX_D3 | |
+| b_out[2] | T21 | HD_TX_D2 | |
+| b_out[1] | V22 | HD_TX_D1 | |
+| b_out[0] | V21 | HD_TX_D0 | |
+||
+| ======= | ====== | ======= | ========= |
 | mcu_wakeup | H20 | KEY7 | MCU 唤醒 |
 | pmu_padon | F7 | LED7 | MCU 电源指示 |
 | pmu_padrst | F8 | LED8 | MCU 复位指示 |

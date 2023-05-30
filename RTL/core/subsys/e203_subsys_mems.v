@@ -491,7 +491,7 @@ sirv_gnrl_icb2axi # (
     .clk           (clk  ),
     .rst_n         (bus_rst_n) 
   );
-/*
+
 sirv_expl_axi_slv # (
   .AW   (32),
   .DW   (`E203_XLEN) 
@@ -535,8 +535,8 @@ sirv_expl_axi_slv # (
     .clk           (clk  ),
     .rst_n         (rst_n) 
   );
-*/
 
+/*
 ddr #(
     .DFI_CLK_PERIOD         (10000),
     .MEM_ROW_WIDTH          (15),
@@ -617,5 +617,5 @@ ddr #(
     .mem_dm(mem_dm)                                       // output [3:0]
 
 );
-
+*/
 endmodule

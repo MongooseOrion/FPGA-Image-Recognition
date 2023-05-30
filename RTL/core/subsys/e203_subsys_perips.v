@@ -136,7 +136,33 @@ module e203_subsys_perips(
   input  ls_clk,
   input  clk,
   input  bus_rst_n,
-  input  rst_n
+  input  rst_n,
+
+  // vision system
+    //cmos1	
+    inout                                cmos1_scl            ,//cmos1 i2c 
+    inout                                cmos1_sda            ,//cmos1 i2c 
+    input                                cmos1_vsync          ,//cmos1 vsync
+    input                                cmos1_href           ,//cmos1 hsync refrence,data valid
+    input                                cmos1_pclk           ,//cmos1 pxiel clock
+    input   [7:0]                        cmos1_data           ,//cmos1 data
+    output                               cmos1_reset          ,//cmos1 reset
+    //cmos2
+    inout                                cmos2_scl            ,//cmos2 i2c 
+    inout                                cmos2_sda            ,//cmos2 i2c 
+    input                                cmos2_vsync          ,//cmos2 vsync
+    input                                cmos2_href           ,//cmos2 hsync refrence,data valid
+    input                                cmos2_pclk           ,//cmos2 pxiel clock
+    input   [7:0]                        cmos2_data           ,//cmos2 data
+    output                               cmos2_reset          ,//cmos2 reset
+    //HDMI_OUT
+    output                               pix_clk                   ,//pixclk                           
+    output                               vs_out                    , 
+    output                               hs_out                    , 
+    output                               de_out                    ,
+    output  [7:0]                        r_out                     , 
+    output  [7:0]                        g_out                     , 
+    output  [7:0]                        b_out         
   );
 
   
@@ -741,26 +767,26 @@ module e203_subsys_perips(
     .o14_icb_rsp_rdata  (expl_axi_icb_rsp_rdata),
 
 
-   //  *      
-    .o15_icb_enable     (1'b0),
+   //  vision system(ov5640, ddr, hdmi) iic control      
+    .o15_icb_enable     (1'b1),
 
-    .o15_icb_cmd_valid  (),
-    .o15_icb_cmd_ready  (1'b0),
-    .o15_icb_cmd_addr   (),
-    .o15_icb_cmd_read   (),
-    .o15_icb_cmd_wdata  (),
-    .o15_icb_cmd_wmask  (),
+    .o15_icb_cmd_valid  (i2c2_apb_icb_cmd_valid),
+    .o15_icb_cmd_ready  (i2c2_apb_icb_cmd_ready),
+    .o15_icb_cmd_addr   (i2c2_apb_icb_cmd_addr ),
+    .o15_icb_cmd_read   (i2c2_apb_icb_cmd_read ),
+    .o15_icb_cmd_wdata  (i2c2_apb_icb_cmd_wdata),
+    .o15_icb_cmd_wmask  (i2c2_apb_icb_cmd_wmask),
     .o15_icb_cmd_lock   (),
     .o15_icb_cmd_excl   (),
     .o15_icb_cmd_size   (),
     .o15_icb_cmd_burst  (),
     .o15_icb_cmd_beat   (),
     
-    .o15_icb_rsp_valid  (1'b0),
-    .o15_icb_rsp_ready  (),
-    .o15_icb_rsp_err    (1'b0),
+    .o15_icb_rsp_valid  (i2c2_apb_icb_rsp_valid),
+    .o15_icb_rsp_ready  (i2c2_apb_icb_rsp_ready),
+    .o15_icb_rsp_err    (i2c2_apb_icb_rsp_err),
     .o15_icb_rsp_excl_ok(1'b0),
-    .o15_icb_rsp_rdata  (32'b0),
+    .o15_icb_rsp_rdata  (i2c2_apb_icb_rsp_rdata),
 
     .clk           (clk  ),
     .rst_n         (bus_rst_n) 
@@ -1566,27 +1592,6 @@ apb_i2c #(
     .sda_padoen_o  (io_pads_i2c0_sda_o_oen)
 );
 
-  // * HDMI
-
-IOBUF #(
-  .DRIVE        (12),
-  .IBUF_LOW_PWR ("TRUE"),
-  .IOSTANDARD   ("DEFAULT"),
-  .SLEW         ("SLOW")
-) IOBUF_iic_sda (
-  .O            (io_pads_i2c0_sda_i_ival),
-  .IO           (iic_tx_sda),
-  .I            (io_pads_i2c0_sda_o_oval),
-  .T            (~io_pads_i2c0_sda_o_oen)
-  );
-
-hdmi u_perips_i2c0_hdmi (
-    .sys_clk       (),
-    .rstn_out      (),
-    .iic_tx_scl    (io_pads_i2c0_sda_i_ival),            // output
-    .iic_tx_sda    (iic_tx_sda)                          // inout
-);
-
 
   // * APB Peripheral:  I2C1
   wire [`E203_ADDR_SIZE-1:0] i2c1_apb_paddr;
@@ -1992,6 +1997,120 @@ sirv_expl_axi_slv # (
     .i_icb_rsp_ready(hclkgen_icb_rsp_ready),
     .i_icb_rsp_rdata(hclkgen_icb_rsp_rdata)
   );
+
+  // * APB Peripheral:  I2C1
+  wire [`E203_ADDR_SIZE-1:0] i2c2_apb_paddr;
+  wire i2c2_apb_pwrite;
+  wire i2c2_apb_pselx;
+  wire i2c2_apb_penable;
+  wire [`E203_XLEN-1:0] i2c2_apb_pwdata;
+  wire [`E203_XLEN-1:0] i2c2_apb_prdata;
+   
+sirv_gnrl_icb2apb # (
+  .AW   (32),
+  .DW   (`E203_XLEN) 
+) u_i2c2_apb_icb2apb(
+    .i_icb_cmd_valid (i2c2_apb_icb_cmd_valid),
+    .i_icb_cmd_ready (i2c2_apb_icb_cmd_ready),
+    .i_icb_cmd_addr  (i2c2_apb_icb_cmd_addr ),
+    .i_icb_cmd_read  (i2c2_apb_icb_cmd_read ),
+    .i_icb_cmd_wdata (i2c2_apb_icb_cmd_wdata),
+    .i_icb_cmd_wmask (i2c2_apb_icb_cmd_wmask),
+    .i_icb_cmd_size  (),
+    
+    .i_icb_rsp_valid (i2c2_apb_icb_rsp_valid),
+    .i_icb_rsp_ready (i2c2_apb_icb_rsp_ready),
+    .i_icb_rsp_rdata (i2c2_apb_icb_rsp_rdata),
+    .i_icb_rsp_err   (i2c2_apb_icb_rsp_err),
+
+    .apb_paddr     (i2c2_apb_paddr  ),
+    .apb_pwrite    (i2c2_apb_pwrite ),
+    .apb_pselx     (i2c2_apb_pselx  ),
+    .apb_penable   (i2c2_apb_penable), 
+    .apb_pwdata    (i2c2_apb_pwdata ),
+    .apb_prdata    (i2c2_apb_prdata ),
+
+    .clk           (clk  ),
+    .rst_n         (bus_rst_n) 
+  );
+
+  wire io_pads_i2c2_scl_o_oen ;
+  wire io_pads_i2c2_sda_o_oen ;
+  wire io_pads_i2c2_sda_o_oval;
+  wire io_pads_i2c2_scl_o_oval;
+  wire io_pads_i2c2_scl_i_ival;
+  wire io_pads_i2c2_sda_i_ival;
+
+apb_i2c #(
+  .APB_ADDR_WIDTH (32) 
+) u_perips_apb_i2c_ext (
+    .HCLK          (clk),
+    .HRESETn       (rst_n),
+    .PADDR         (i2c2_apb_paddr),
+    .PWDATA        (i2c2_apb_pwdata),
+    .PWRITE        (i2c2_apb_pwrite),
+    .PSEL          (i2c2_apb_pselx),
+    .PENABLE       (i2c2_apb_penable),
+    .PRDATA        (i2c2_apb_prdata),
+    .PREADY        (),
+    .PSLVERR       (),
+
+    .interrupt_o   (i2c2_mst_irq),
+    .scl_pad_i     (io_pads_i2c2_scl_i_ival),
+    .scl_pad_o     (io_pads_i2c2_scl_o_oval),
+    .scl_padoen_o  (io_pads_i2c2_scl_o_oen),
+    .sda_pad_i     (io_pads_i2c2_sda_i_ival),
+    .sda_pad_o     (io_pads_i2c2_sda_o_oval),
+    .sda_padoen_o  (io_pads_i2c2_sda_o_oen)
+);
+
+
+  // * HDMI
+wire iic_tx_sda;
+
+IOBUF #(
+  .DRIVE        (12),
+  .IBUF_LOW_PWR ("TRUE"),
+  .IOSTANDARD   ("DEFAULT"),
+  .SLEW         ("SLOW")
+) IOBUF_iic_sda (
+  .O            (io_pads_i2c2_sda_i_ival),
+  .IO           (iic_tx_sda),
+  .I            (io_pads_i2c2_sda_o_oval),
+  .T            (~io_pads_i2c2_sda_o_oen)
+  );
+
+hdmi_ddr_ov5640_top u_perips_i2c2_vision_sys (
+  .sys_clk        (clkout2),
+
+  .iic_tx_scl     (io_pads_i2c2_scl_i_ival),
+  .iic_tx_sda     (iic_tx_sda),
+
+  .r_out          (r_out),
+  .g_out          (g_out),
+  .b_out          (b_out),
+  .de_out         (de_out),
+  .hs_out         (hs_out),
+  .vs_out         (vs_out),
+  .pix_clk        (pix_clk),
+
+  .cmos1_data     (cmos1_data),
+  .cmos1_scl      (cmos1_scl),
+  .cmos1_sda      (cmos1_sda),
+  .cmos1_reset    (cmos1_reset),
+  .cmos1_href     (cmos1_href),
+  .cmos1_pclk     (cmos1_pclk),
+  .cmos1_vsync    (cmos1_vsync),
+
+  .cmos2_data     (cmos2_data),
+  .cmos2_scl      (cmos2_scl),
+  .cmos2_sda      (cmos2_sda),
+  .cmos2_reset    (cmos2_reset),
+  .cmos2_href     (cmos2_href),
+  .cmos2_pclk     (cmos2_pclk),
+  .cmos2_vsync    (cmos2_vsync)
+);
+
 
 
   // The GPIOA IOF SET 

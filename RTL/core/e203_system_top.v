@@ -24,7 +24,33 @@ module e203_system_top(
   //pmu_wakeup
   inout           pmu_paden,  //PMU_VDDPADEN-U15
   inout           pmu_padrst, //PMU_VADDPARST_V15
-  inout           mcu_wakeup  //MCU_WAKE-N15
+  inout           mcu_wakeup,  //MCU_WAKE-N15
+
+  // vision system
+    //cmos1
+    inout                                cmos1_scl            ,//cmos1 i2c 
+    inout                                cmos1_sda            ,//cmos1 i2c 
+    input                                cmos1_vsync          ,//cmos1 vsync
+    input                                cmos1_href           ,//cmos1 hsync refrence,data valid
+    input                                cmos1_pclk           ,//cmos1 pxiel clock
+    input   [7:0]                        cmos1_data           ,//cmos1 data
+    output                               cmos1_reset          ,//cmos1 reset
+    //cmos2
+    inout                                cmos2_scl            ,//cmos2 i2c 
+    inout                                cmos2_sda            ,//cmos2 i2c 
+    input                                cmos2_vsync          ,//cmos2 vsync
+    input                                cmos2_href           ,//cmos2 hsync refrence,data valid
+    input                                cmos2_pclk           ,//cmos2 pxiel clock
+    input   [7:0]                        cmos2_data           ,//cmos2 data
+    output                               cmos2_reset          ,//cmos2 reset
+    //HDMI_OUT
+    output                               pix_clk                   ,//pixclk                           
+    output                               vs_out                    , 
+    output                               hs_out                    , 
+    output                               de_out                    ,
+    output  [7:0]                        r_out                     , 
+    output  [7:0]                        g_out                     , 
+    output  [7:0]                        b_out         
 );
 
 wire          hfextclk;
@@ -135,8 +161,11 @@ clk_top u_e203_clk(
   .pll_rst            (globalrst),      
   .clkin1             (clkin1),      
   .pll_lock           (pll_lock),     
-  .clkout0            (hfextclk),    
-  .clkout1            (lfextclk)    
+  .clk16mhz           (hfextclk),    
+  .clk32khz           (lfextclk),
+  .clkout2            (clkout2),
+  .clkout3            (clkout3),
+  .clkout4            (clkout4)
 );
 
 
@@ -303,7 +332,32 @@ e203_soc_top u_e203_soc_top (
 
   .io_pads_dbgmode0_n_i_ival        (dut_io_pads_dbgmode0_n_i_ival),
   .io_pads_dbgmode1_n_i_ival        (dut_io_pads_dbgmode1_n_i_ival),
-  .io_pads_dbgmode2_n_i_ival        (dut_io_pads_dbgmode2_n_i_ival) 
+  .io_pads_dbgmode2_n_i_ival        (dut_io_pads_dbgmode2_n_i_ival),
+
+  // Note: vision system
+    .r_out          (r_out),
+    .g_out          (g_out),
+    .b_out          (b_out),
+    .de_out         (de_out),
+    .hs_out         (hs_out),
+    .vs_out         (vs_out),
+    .pix_clk        (pix_clk),
+
+    .cmos1_data     (cmos1_data),
+    .cmos1_scl      (cmos1_scl),
+    .cmos1_sda      (cmos1_sda),
+    .cmos1_reset    (cmos1_reset),
+    .cmos1_href     (cmos1_href),
+    .cmos1_pclk     (cmos1_pclk),
+    .cmos1_vsync    (cmos1_vsync),
+
+    .cmos2_data     (cmos2_data),
+    .cmos2_scl      (cmos2_scl),
+    .cmos2_sda      (cmos2_sda),
+    .cmos2_reset    (cmos2_reset),
+    .cmos2_href     (cmos2_href),
+    .cmos2_pclk     (cmos2_pclk),
+    .cmos2_vsync    (cmos2_vsync)  
 );
 
 // Assign reasonable values to otherwise unconnected inputs to chip top

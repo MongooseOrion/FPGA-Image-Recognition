@@ -236,7 +236,33 @@ module e203_subsys_top(
   output  io_pads_jtag_TRST_n_o_ds,
 
   input  test_iso_override,
-  input  test_mode 
+  input  test_mode, 
+
+  // vision system
+    //coms1	
+    inout                                cmos1_scl            ,//cmos1 i2c 
+    inout                                cmos1_sda            ,//cmos1 i2c 
+    input                                cmos1_vsync          ,//cmos1 vsync
+    input                                cmos1_href           ,//cmos1 hsync refrence,data valid
+    input                                cmos1_pclk           ,//cmos1 pxiel clock
+    input   [7:0]                        cmos1_data           ,//cmos1 data
+    output                               cmos1_reset          ,//cmos1 reset
+    //coms2
+    inout                                cmos2_scl            ,//cmos2 i2c 
+    inout                                cmos2_sda            ,//cmos2 i2c 
+    input                                cmos2_vsync          ,//cmos2 vsync
+    input                                cmos2_href           ,//cmos2 hsync refrence,data valid
+    input                                cmos2_pclk           ,//cmos2 pxiel clock
+    input   [7:0]                        cmos2_data           ,//cmos2 data
+    output                               cmos2_reset          ,//cmos2 reset
+    //HDMI_OUT
+    output                               pix_clk                   ,//pixclk                           
+    output                               vs_out                    , 
+    output                               hs_out                    , 
+    output                               de_out                    ,
+    output  [7:0]                        r_out                     , 
+    output  [7:0]                        g_out                     , 
+    output  [7:0]                        b_out         
   );
 
   wire hfclk;// The PLL generated high-speed clock 
@@ -478,7 +504,31 @@ module e203_subsys_top(
     .ls_clk        (lfextclk), 
     .hfclk         (hfclk   ),
     .hfclkrst      (hfclkrst),
-    .corerst       (corerst)
+    .corerst       (corerst),
+
+    .r_out          (r_out),
+    .g_out          (g_out),
+    .b_out          (b_out),
+    .de_out         (de_out),
+    .hs_out         (hs_out),
+    .vs_out         (vs_out),
+    .pix_clk        (pix_clk),
+
+    .cmos1_data     (cmos1_data),
+    .cmos1_scl      (cmos1_scl),
+    .cmos1_sda      (cmos1_sda),
+    .cmos1_reset    (cmos1_reset),
+    .cmos1_href     (cmos1_href),
+    .cmos1_pclk     (cmos1_pclk),
+    .cmos1_vsync    (cmos1_vsync),
+
+    .cmos2_data     (cmos2_data),
+    .cmos2_scl      (cmos2_scl),
+    .cmos2_sda      (cmos2_sda),
+    .cmos2_reset    (cmos2_reset),
+    .cmos2_href     (cmos2_href),
+    .cmos2_pclk     (cmos2_pclk),
+    .cmos2_vsync    (cmos2_vsync) 
   );
 
 

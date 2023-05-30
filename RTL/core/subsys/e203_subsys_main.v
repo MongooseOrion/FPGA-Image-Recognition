@@ -236,8 +236,33 @@ module e203_subsys_main(
   input  corerst, // The original async reset
   input  hfclkrst, // The original async reset
   input  hfextclk,// The original clock from crystal
-  output hfclk // The generated clock by HCLKGEN
+  output hfclk, // The generated clock by HCLKGEN
 
+  // vision system
+    //cmos1
+    inout                                cmos1_scl            ,//cmos1 i2c 
+    inout                                cmos1_sda            ,//cmos1 i2c 
+    input                                cmos1_vsync          ,//cmos1 vsync
+    input                                cmos1_href           ,//cmos1 hsync refrence,data valid
+    input                                cmos1_pclk           ,//cmos1 pxiel clock
+    input   [7:0]                        cmos1_data           ,//cmos1 data
+    output                               cmos1_reset          ,//cmos1 reset
+    //cmos2
+    inout                                cmos2_scl            ,//cmos2 i2c 
+    inout                                cmos2_sda            ,//cmos2 i2c 
+    input                                cmos2_vsync          ,//cmos2 vsync
+    input                                cmos2_href           ,//cmos2 hsync refrence,data valid
+    input                                cmos2_pclk           ,//cmos2 pxiel clock
+    input   [7:0]                        cmos2_data           ,//cmos2 data
+    output                               cmos2_reset          ,//cmos2 reset
+    //HDMI_OUT
+    output                               pix_clk                   ,//pixclk                           
+    output                               vs_out                    , 
+    output                               hs_out                    , 
+    output                               de_out                    ,
+    output  [7:0]                        r_out                     , 
+    output  [7:0]                        g_out                     , 
+    output  [7:0]                        b_out         
   );
 
  wire [31:0] inspect_pc;
@@ -832,7 +857,31 @@ e203_subsys_clint u_e203_subsys_clint(
     .ls_clk        (ls_clk  ),
     .clk           (hfclk  ),
     .bus_rst_n     (bus_rst_n), 
-    .rst_n         (per_rst_n) 
+    .rst_n         (per_rst_n),
+
+    .r_out          (r_out),
+    .g_out          (g_out),
+    .b_out          (b_out),
+    .de_out         (de_out),
+    .hs_out         (hs_out),
+    .vs_out         (vs_out),
+    .pix_clk        (pix_clk),
+
+    .cmos1_data     (cmos1_data),
+    .cmos1_scl      (cmos1_scl),
+    .cmos1_sda      (cmos1_sda),
+    .cmos1_reset    (cmos1_reset),
+    .cmos1_href     (cmos1_href),
+    .cmos1_pclk     (cmos1_pclk),
+    .cmos1_vsync    (cmos1_vsync),
+
+    .cmos2_data     (cmos2_data),
+    .cmos2_scl      (cmos2_scl),
+    .cmos2_sda      (cmos2_sda),
+    .cmos2_reset    (cmos2_reset),
+    .cmos2_href     (cmos2_href),
+    .cmos2_pclk     (cmos2_pclk),
+    .cmos2_vsync    (cmos2_vsync) 
   );
 
 e203_subsys_mems u_e203_subsys_mems(
