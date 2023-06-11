@@ -3,6 +3,8 @@ import os
 import sys
 import json
 import shutil
+import numpy as np
+import random
 
 # 把视频所有帧分离为图片
 def save_img():
@@ -155,9 +157,9 @@ def move():
 
 # 交叉比对图片是否都有对应的标注文件，有的放一个文件夹，没有的放另一个文件夹
 def verify():
-    img_path = 'C:\\Users\\smn90\\repo\\FPGA-Image-Recognition\\dataset\\video\\'
-    txt_path = 'C:\\Users\\smn90\\repo\\FPGA-Image-Recognition\\dataset\\train_new.txt'
-    new_path = 'C:\\Users\\smn90\\repo\\FPGA-Image-Recognition\\dataset\\video\\new_folder'
+    img_path = 'C:\\Users\\smn90\\repo\\FPGA-Image-Recognition\\dataset\\video_temp\\'
+    txt_path = 'C:\\Users\\smn90\\repo\\FPGA-Image-Recognition\\dataset\\train_extract.txt'
+    new_path = 'C:\\Users\\smn90\\repo\\FPGA-Image-Recognition\\dataset\\video\\'
     
     with open(txt_path,'r') as f:
         for line in f:
@@ -166,10 +168,14 @@ def verify():
             #print(file_path)
             # 检查文件是否存在
             if os.path.isfile(file_path):
-                shutil.move(file_path,new_path)
+                #shutil.move(file_path,new_path)
+                pass
             else:
+                print(file_path)
+            '''
                 with open('train_failed.txt','a') as fail:
                     fail.write(line)
+                    '''
 '''
             ans = input('input anything: ')
             if ans=='1':
@@ -249,6 +255,96 @@ def txt_veri():
             else:
                 pass
 
+# 将多种分辨率的照片全部缩放为 416x416，并在保持原始比例的情况下进行填充
+def resize_and_pad():
+    file_path = 'C:\\Users\\smn90\\repo\\FPGA-Image-Recognition\\dataset\\train_new_2.txt'
+    resize_path = 'C:\\Users\\smn90\\repo\\FPGA-Image-Recognition\\dataset\\video_resize\\'
+    target_size = (416, 416)
+
+    with open(file_path, 'r') as f:
+        for line in f:
+            line_list = line.split()
+            image = cv2.imread(line_list[0])
+    
+            # 获取原始图像的尺寸
+            height, width = image.shape[:2]
+            # 计算缩放比例
+            scale = min(target_size[0] / width, target_size[1] / height)
+            new_width = int(width * scale)
+            new_height = int(height * scale)
+            # 缩放图像
+            resized_image = cv2.resize(image, (new_width, new_height))
+            # 创建目标大小的画布
+            canvas = np.ones((target_size[1], target_size[0], 3), dtype=np.uint8) * 255
+            # 计算填充位置
+            x_offset = (target_size[0] - new_width) // 2
+            y_offset = (target_size[1] - new_height) // 2
+            # 将缩放后的图像复制到画布上
+            canvas[y_offset:y_offset + new_height, x_offset:x_offset + new_width, :] = resized_image
+
+            # 保存
+            # 获取原始图像的文件名
+            image_name = os.path.basename(line_list[0])
+            # 构建保存路径
+            output_path = os.path.join(resize_path, image_name)
+            # 保存缩放和填充后的图像
+            cv2.imwrite(output_path, canvas)
+
+
+# 仅抽取一部分图片用于训练，直接操作目标 txt 文件
+def simple():
+    file_path = 'C:\\Users\\smn90\\repo\\FPGA-Image-Recognition\\dataset\\train_raw.txt'
+    new_path = 'C:\\Users\\smn90\\repo\\FPGA-Image-Recognition\\dataset\\train_extract.txt'
+
+    video_frames = {}
+    line_list = []
+    data_list = []
+    pre_video_id = None
+    flag = 0
+    with open(file_path,'r') as f, open(new_path,'w') as new:
+        for line in f:
+            line_list = line.split()
+            image_path = line_list[0]
+            video_id = image_path.split('\\')[-1].split('_')[-2]
+            frame_number = image_path.split('_')[-1].split('.')[0]
+
+            if video_id not in video_frames:
+                video_frames[video_id] = []
+            video_frames[video_id].append(frame_number)
+            
+            if video_id == pre_video_id:
+                flag = flag + 1
+                data_list.append(line)
+            else:
+                if pre_video_id == None:
+                    pass
+                else:
+                    tag = int(flag * 0.2)
+                    random_numbers = random.sample(range(flag), tag)
+
+                    for item in random_numbers:
+                        new.write(data_list[item])
+
+                    flag = 0
+                    data_list = [line]
+
+            pre_video_id = video_id
+                
+            
+
+# 将 train.txt 的数据按行打乱  
+def index():
+    file_path = 'C:\\Users\\smn90\\repo\\FPGA-Image-Recognition\\dataset\\train_extract.txt'
+    new_path = 'C:\\Users\\smn90\\repo\\FPGA-Image-Recognition\\dataset\\train_new_3.txt'
+    with open(file_path, 'r') as f:
+        lines = f.readlines()
+
+    # 打乱数据顺序
+    random.shuffle(lines)
+
+    # 将打乱后的数据写回文件
+    with open(new_path, 'w') as f:
+        f.writelines(lines)
 
 
 
@@ -257,7 +353,10 @@ def txt_veri():
 #rename()
 #fm_js()
 #move()
-#verify()
+verify()
 #modify()
 #categary()
-txt_veri()
+#txt_veri()
+#resize_and_pad()
+#simple()
+index()

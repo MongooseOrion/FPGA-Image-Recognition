@@ -20,8 +20,9 @@
 **/.Xil
 **/.jobs
 /project.old
+/document/pic/
 /dataset/*
 !/dataset/process.py
 !/dataset/categary.txt
-!/dataset/train_failed.txt
-!/dataset/train_new_2.txt
+!/dataset/train_main.txt
+!/dataset/train_raw.txt
