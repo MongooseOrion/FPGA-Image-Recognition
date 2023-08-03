@@ -6,9 +6,7 @@
 
 MES50HP 配有两个 4Gbit（512MB）的 DDR3 芯片（共计 8Gbit），DDR 的总线宽度为 32bit。DDR3 的储存直接连接到 FPGA 的 BANK B3。
 
-在 PDS 中，DDR 模块作为 IP 核提供，数据接口包括 AXI4 lite 总线和 APB 总线。由于 wujian100 的总线为 AHB lite 协议，因此需要 AHB Lite 转 AXI4 Lite 转接桥。具体内容请参阅 `../RTL/ahb_to_axi_bridge.v`。
-
-该 IP 核的 AXI4 Lite 接口部分挂载在 `x_main_dummy_top3` 的位置，APB 接口部分挂载在 `x_apb1_dummy_top8` 的位置。
+在 PDS 中，DDR 模块作为 IP 核提供，数据接口包括 AXI4 lite 总线和 APB 总线。
 
 请注意，在此处的端口名称按照 `IP Catelog` 中所给出的命名为准，可能与开发手册中的有所不同。
 
@@ -49,64 +47,15 @@ MES50HP 配有两个 4Gbit（512MB）的 DDR3 芯片（共计 8Gbit），DDR 的总线宽度为 32bi
 | DQ[16-23] | B3 | G3 |
 | DQ[24-31] | B3 | G2 |
 
-## MCU 系统约束
+## FPGA I/O 接口约束
 
-| 端口名 | 管脚编号 | 硬件位置 | 管脚功能 |
-|:----- | :----: | :-----: |:---- |
-| gpioA[31] | C4 | NULL | SD_CLK |
-| gpioA[30] | A4 | NULL | SD_CMD |
-| gpioA[29] | D5 | NULL | SD_DATA[0] |
-| gpioA[28] | D4 | NULL | SD_DATA[1] |
-| gpioA[27] | D2 | NULL | SD_DATA[2] |
-| gpioA[26] | D3 | NULL | SD_DATA[3] |
-| gpioA[25] | G9 | NULL | SD_DETECT |
-| gpioA[17] | R9 | NULL | UART_TX |
-| gpioA[16] | R8 | NULL | UART_RX |
-| gpioA[13] | F15 | NULL | EEPROM(IIC)_SCL |
-| gpioA[12] | G8 | NULL | EEPROM(IIC)_SDA |
-| ======= | ====== | ======= | ========= |
-| gpioB[31] | AA4 | PIN36 | |
-| gpioB[30] | AB4 | PIN35 | |
-| gpioB[29] | Y5 | PIN34 | |
-| gpioB[28] | AB5 | PIN33 | |
-| gpioB[27] | W6 | PIN32 | |
-| gpioB[26] | Y6 | PIN31 | |
-| gpioB[25] | AA8 | PIN30 | |
-| gpioB[24] | AB8 | PIN29 | |
-| gpioB[23] | V7 | PIN28 | |
-| gpioB[22] | W8 | PIN27 | |
-| gpioB[21] | T8 | PIN26 | |
-| gpioB[20] | U8 | PIN25 | |
-| gpioB[19] | U9 | PIN24 | |
-| gpioB[18] | V9 | PIN23 | |
-| gpioB[17] | Y9 | PIN22 | |
-| gpioB[16] | AB9 | PIN21 | |
-| ======= | ====== | ======= | ========= |
-| b_out[7] | P19 | HD_TX_D7 | |
-| b_out[6] | R19 | HD_TX_D6 | |
-| b_out[5] | R22 | HD_TX_D5 | |
-| b_out[4] | R20 | HD_TX_D4 | |
-| b_out[3] | T22 | HD_TX_D3 | |
-| b_out[2] | T21 | HD_TX_D2 | |
-| b_out[1] | V22 | HD_TX_D1 | |
-| b_out[0] | V21 | HD_TX_D0 | |
-||
-| ======= | ====== | ======= | ========= |
-| mcu_wakeup | H20 | KEY7 | MCU 唤醒 |
-| pmu_padon | F7 | LED7 | MCU 电源指示 |
-| pmu_padrst | F8 | LED8 | MCU 复位指示 |
-| ======= | ====== | ======= | ========= |
-| mcu_TCK | U6 | PMOD PIN7 | JTAG |
-| mcu_TDI | AB7 | PMOD PIN3 | JTAG |
-| mcu_TDO | Y8 | PMOD PIN5 | JTAG |
-| mcu_TMS | AB6 | PMOD PIN1 | JTAG |
-| ======= | ====== | ======= | ========= |
-| qspi0_dq[3] | T14 | QSPI_7 | QSPI 数据位 |
-| qspi0_dq[2] | R13 | QSPI_3 | QSPI 数据位 |
-| qspi0_dq[1] | AA20 | QSPI_2 | QSPI 数据位 |
-| qspi0_dq[0] | AB20 | QSPI_5 | QSPI 数据位 |
-| qspi0_cs | AA3 | QSPI_1 | QSPI 片选 |
-| qspi0_sck | Y20 | QSPI_6 | 串行数据时钟 |
-| ======= | ====== | ======= | ========= |
-| clkin1 | P20 | NULL | clock |
-| globalrst | H17 | KEY8 | reset |
+| 资源编号 | 占用的信号名称 | 信号作用 |
+| :---- | :-----: | :-----: |
+| LED_1 | hdmi_int_led | HDMI 初始化成功指示 |
+| LED_2 | ddr_init_done | DDR 初始化成功指示 |
+| LED_3 | cmos_init_done[0] | CMOS_1 初始化成功指示 |
+| LED_4 | cmos_init_done[1] | CMOS_2 初始化成功指示 |
+| LED_5 | heart_beat_led | HDMI 路径工作指示 |
+| LED_6 | eth_init | 以太网 UDP 路径工作指示|
+| SW_1 | globalrst | 全局复位 |
+| SW_2| / | CMOS 切换 |

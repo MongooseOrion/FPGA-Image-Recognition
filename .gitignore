@@ -22,7 +22,9 @@
 /project.old
 /document/pic/
 /dataset/*
+/software/keil
 !/dataset/process.py
 !/dataset/categary.txt
 !/dataset/train_main.txt
 !/dataset/train_raw.txt
+/RTL/filelist.py

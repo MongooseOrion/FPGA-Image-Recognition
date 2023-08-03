@@ -1,3 +1,7 @@
+#
+# 对数据集进行处理
+#
+
 import cv2
 import os
 import sys
@@ -353,10 +357,10 @@ def index():
 #rename()
 #fm_js()
 #move()
-verify()
+#verify()
 #modify()
 #categary()
 #txt_veri()
 #resize_and_pad()
 #simple()
-index()
+#index()
