@@ -20,7 +20,7 @@
 **/.Xil
 **/.jobs
 /project.old
-/document/pic/
+
 /dataset/*
 /software/keil
 !/dataset/process.py
