@@ -28,3 +28,5 @@
 !/dataset/train_main.txt
 !/dataset/train_raw.txt
 /RTL/filelist.py
+
+/document/ip_settings.md

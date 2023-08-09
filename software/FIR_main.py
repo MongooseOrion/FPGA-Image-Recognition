@@ -26,7 +26,7 @@ received_data = bytearray()
 expected_image_size = 1280 * 720 * 3
 
 # 加载YOLOv3模型
-model_path = settings.DEFAULT_MODEL_PATH  # 根据实际路径修改
+model_path = settings.DEFAULT_MODEL_PATH  # 在此处根据实际路径修改
 yolo = YOLO(model_path=model_path)
 
 # 创建视频编写器

@@ -39,7 +39,7 @@ YUV422 格式的视频信号在传输过程中，数据通过 UDP 模块拆分�
 ## 软件侧
 ### 深度学习模型介绍
 
-该项目采用的目标检测模型为 Yolov3。有关模型的更多细节，可访问作者存储库[在 Tensorflow2 上使用 yolov3 进行目标检测](https://github.com/MongooseOrion/tf2-keras-yolo3)了解
+该项目采用的目标检测模型为 Yolov3。有关模型的更多细节，可访问作者存储库[在 Tensorflow2 上使用 yolov3 进行目标检测](https://github.com/MongooseOrion/tf2-keras-yolo3)了解，在本仓库中不再重新添加相关模型文件。
 
 ### 电脑端 UDP 接收程序设计
 JPEG 的起始标识符应该是 $\\xff\\xd8\\xff\\xe0$。使用 find() 方法可查找起始标识符在 received_data 中的位置。如果找到了起始标识符，则继续检查结束标识符。

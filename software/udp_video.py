@@ -4,7 +4,7 @@ import cv2
 
 UDP_IP = "192.168.0.3"  # 监听所有可用的网络接口
 UDP_PORT = 8080
-BUFFER_SIZE = 2048
+BUFFER_SIZE = 2700000
 
 # 创建UDP套接字
 udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -30,6 +30,22 @@ while True:
         end_pos = received_data.find(end_marker, start_pos + len(start_marker))
         
         if end_pos != -1:
+            
+            data_length = end_pos - start_pos
+            if data_length < 345600:
+                # 继续接收数据，直到达到指定长度
+                while data_length < 345600:
+                    additional_data, _ = udp_socket.recvfrom(BUFFER_SIZE)
+                    received_data += additional_data
+                    data_length = len(received_data) - start_pos
+
+                    # 检查是否出现新的结束符
+                    new_end_pos = received_data.find(end_marker, end_pos + len(end_marker))
+                    if new_end_pos != -1:
+                        # 更新结束符位置
+                        end_pos = new_end_pos
+                        data_length = end_pos - start_pos
+
             # 截取图像数据
             image_data = received_data[start_pos:end_pos + len(end_marker)]
             
