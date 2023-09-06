@@ -132,7 +132,6 @@ module fpga_top#(
     wire                        de_1_pc             ;
     wire                        i_rgb565_1_pc       ;
     wire                        pclk_2_local        ;
-    wire                        pclk_2_local        ;
     wire                        vs_2_local          ;
     wire                        de_2_local          ;
     wire[15:0]                  i_rgb565_2_local    ;
