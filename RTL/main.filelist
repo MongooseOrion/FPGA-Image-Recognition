@@ -4,7 +4,6 @@
 eth_trans.v
 fpga_top.v
 reg_config_1.v
-video_scale.v
 arp_cache.v
 crc.v
 dpram.v
