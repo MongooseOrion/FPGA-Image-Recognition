@@ -1,76 +1,97 @@
+import threading
 import socket
 import numpy as np
 import cv2
+import time
 
-UDP_IP = "192.168.0.3"  # 监听所有可用的网络接口
-UDP_PORT = 8080
-BUFFER_SIZE = 2700000
-
-# 创建UDP套接字
-udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-udp_socket.bind((UDP_IP, UDP_PORT))
-
-# 用于保存已接收的图像数据
+# 共享数据
 received_data = bytearray()
 
-while True:
-    # 接收数据
-    data, addr = udp_socket.recvfrom(BUFFER_SIZE)
-    
-    # 添加接收到的数据到已接收的数据缓冲区
-    received_data += data
-    
-    # 检查起始标识符
-    start_marker = b"\xff\xd8\xff\xe0"
-    start_pos = received_data.find(start_marker)
-    
-    if start_pos != -1:
-        # 检查结束标识符
-        end_marker = b"\xff\xd9"
-        end_pos = received_data.find(end_marker, start_pos + len(start_marker))
-        
-        if end_pos != -1:
-            
-            data_length = end_pos - start_pos
-            if data_length < 345600:
-                # 继续接收数据，直到达到指定长度
-                while data_length < 345600:
-                    additional_data, _ = udp_socket.recvfrom(BUFFER_SIZE)
-                    received_data += additional_data
-                    data_length = len(received_data) - start_pos
+# 创建一个锁
+lock = threading.Lock()
 
-                    # 检查是否出现新的结束符
-                    new_end_pos = received_data.find(end_marker, end_pos + len(end_marker))
-                    if new_end_pos != -1:
-                        # 更新结束符位置
-                        end_pos = new_end_pos
-                        data_length = end_pos - start_pos
+# 创建一个事件，用于通知线程退出
+exit_event = threading.Event()
 
-            # 截取图像数据
-            image_data = received_data[start_pos:end_pos + len(end_marker)]
-            
-            # 解码图像数据
-            try:
-                image = np.frombuffer(image_data, dtype=np.uint8)
-                image = cv2.imdecode(image, cv2.IMREAD_COLOR)
-               
-                # 显示图像
-                cv2.imshow("Frame", image)
-                
-                # 清除已显示的图像数据
-                received_data = received_data[end_pos + len(end_marker):]
-                
-            except Exception as e:
-                print(f"Failed to decode image: {e}")
-        
-        else:
-            # 未找到结束标识符，继续接收数据
-            continue
-    
-    # 按下 'q' 键退出循环
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
+# 第一个函数，用于不停的接收数据
+def udp_receive_data():
+    global received_data
+    UDP_IP = "192.168.0.3"  # 监听所有可用的网络接口
+    UDP_PORT = 8080
+    BUFFER_SIZE = 10240
+    # 创建UDP套接字
+    udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    udp_socket.bind((UDP_IP, UDP_PORT))
+    while not exit_event.is_set():
+        # 接收数据 在使用共享数据之前先获取锁
+        data, addr = udp_socket.recvfrom(BUFFER_SIZE)
+        with lock:
+            received_data += data
+        # 在使用完共享数据后释放锁
 
-# 清理资源
-udp_socket.close()
-cv2.destroyAllWindows()
+# 第二个函数，用于显示图像
+def cv_imshow():
+    global received_data
+    start_marker = b"\xff\xd8"
+    end_marker = b"\xff\xd9"
+    i = 0
+    start_time = 0
+    end_time = 0
+    fps = 0
+    # 帧率显示数字大小等参数设置
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    font_scale = 0.5
+    font_thickness = 1
+    font_color = (255, 255, 255)  # 白色
+    while not exit_event.is_set():
+        #检查起始标识符
+        # with lock:
+        start_pos = received_data.find(start_marker)
+        if start_pos != -1:
+            while True:
+                time.sleep(0.005)    #当检查到起始符后，要过一段时间结束符才会到来，暂停一小会防止程序卡死
+                # 检查结束标识符
+                with lock:
+                    end_pos = received_data.find(end_marker, start_pos + len(start_marker))
+                if end_pos != -1:
+                    with lock:
+                        image_data = received_data[start_pos:end_pos + len(end_marker)]
+                        received_data = received_data[end_pos + len(end_marker):]  #清除已经显示信息
+                    try:
+                        image = np.frombuffer(image_data, dtype=np.uint8)
+                        image = cv2.imdecode(image, cv2.IMREAD_COLOR)
+                        height, width, channels = image.shape
+                        resolution_str = f"Resolution: {width} x {height}"
+                        #帧率计算，15帧计算一次，并在图片数据上添加帧率数据
+                        if(i==1):
+                            start_time = time.time()
+                        elif (i==16):
+                            i=0
+                            end_time = time.time()
+                            fps = 15/(end_time - start_time)     
+                        cv2.putText(image, f'FPS: {fps:.2f}', (10, 30), font, font_scale, font_color, font_thickness)  
+                        cv2.imshow(resolution_str, image)
+                        i=i+1
+                        key = cv2.waitKey(1)
+                        if key == ord('q'):  # 按下 'q' 键退出
+                            exit_event.set()
+                    except Exception as e:
+                        print(f"Failed to decode image: {e}")
+
+                    break #跳出循环
+
+# 创建两个线程，分别运行两个不同的函数
+thread1 = threading.Thread(target=udp_receive_data)
+thread2 = threading.Thread(target=cv_imshow)
+
+# 启动线程
+thread1.start()
+thread2.start()
+
+
+
+# 等待两个线程执行完毕
+thread1.join()
+thread2.join()
+
+print("Main thread exiting.")
