@@ -1,3 +1,29 @@
+''' ======================================================================
+* Copyright (c) 2023, MongooseOrion.
+* All rights reserved.
+*
+* The following code snippet may contain portions that are derived from
+* OPEN-SOURCE communities, and these portions will be licensed with: 
+*
+* <NULL>
+*
+* If there is no OPEN-SOURCE licenses are listed, it indicates none of
+* content in this Code document is sourced from OPEN-SOURCE communities. 
+*
+* In this case, the document is protected by copyright, and any use of
+* all or part of its content by individuals, organizations, or companies
+* without authorization is prohibited, unless the project repository
+* associated with this document has added relevant OPEN-SOURCE licenses
+* by github.com/MongooseOrion. 
+*
+* Please make sure using the content of this document in accordance with 
+* the respective OPEN-SOURCE licenses. 
+* 
+* THIS CODE IS PROVIDED BY https://github.com/MongooseOrion. 
+* FILE ENCODER TYPE: UTF-8
+* ========================================================================
+'''
+# 使用 yolo 对 UDP 传输的图像数据进行目标检测，单线程
 import socket
 import numpy as np
 import cv2
@@ -26,7 +52,7 @@ received_data = bytearray()
 expected_image_size = 1280 * 720 * 3
 
 # 加载YOLOv3模型
-model_path = settings.DEFAULT_MODEL_PATH  # 根据实际路径修改
+model_path = settings.DEFAULT_MODEL_PATH  # 在此处根据实际路径修改
 yolo = YOLO(model_path=model_path)
 
 # 创建视频编写器
@@ -48,13 +74,11 @@ while True:
     received_data += data
     
     # 检查起始标识符
-    #start_marker = b"\xff\xd8\xff\xe0"
-    start_marker = b"\xff\xd8"
+    start_marker = b"\xff\xd8\xff\xe0"
     start_pos = received_data.find(start_marker)
     
     if start_pos != -1:
         # 检查结束标识符
-        #end_marker = b"\xff\xd9"
         end_marker = b"\xff\xd9"
         end_pos = received_data.find(end_marker, start_pos + len(start_marker))
         
