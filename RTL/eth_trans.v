@@ -2,14 +2,11 @@
 module eth_trans (
 
     input                       sys_clk,                    // 50MHz
-    //input                       key,
     input                       rst_n,
-    input                       rst_n_test,
     output                      led,
     // ÊäÈëÍ¼ÏñÊı¾İ
     input           vin_clk,
     input [7:0]     vin_data,
-    //input           vin_pclk,
     input           vin_vsync,
     input           vin_hsync,
 
