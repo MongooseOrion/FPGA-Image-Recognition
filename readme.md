@@ -68,6 +68,7 @@ JPEG 的结束标识符应该是 `\xff\xd9`。使用 `find()` 方法可在 `rece
 有关处理数据集的源代码，请[点此](https://github.com/MongooseOrion/FPGA-Image-Recognition/blob/master/dataset/process.py)查看。
 
 ## 识别效果
+
 为保证截图效果，设置了中断，因此程序状态显示为 “未响应”。
 
 <div align = 'center'><img src = './document\pic\图片2.png' height='300'></div>
